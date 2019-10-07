@@ -10,7 +10,7 @@
 
 using namespace std;
 
-//Web Servie
+//Web Service
 std::wstring get_utf16(const std::string& str, int codepage) {
 	if (str.empty()) return std::wstring();
 	int sz = MultiByteToWideChar(codepage, 0, &str[0], (int)str.size(), 0, 0);
