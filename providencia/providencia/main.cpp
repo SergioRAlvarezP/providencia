@@ -432,7 +432,6 @@ int main() {
 					str_key.key = key;
 
 					QUEUE.push(str_key);
-					queue<tecla>* cola = &QUEUE;
 
 					//Impresión de depuración
 					cout << str_key.key + "\t";
